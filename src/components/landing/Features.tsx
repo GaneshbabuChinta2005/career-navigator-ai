@@ -91,7 +91,7 @@ export function Features() {
             <motion.div
               key={feature.title}
               variants={staggerItem}
-              whileHover={cardHoverStyle}
+              whileHover={{ y: -4 }}
               transition={{ duration: 0.3 }}
               className={`group relative ${feature.span}`}
             >
