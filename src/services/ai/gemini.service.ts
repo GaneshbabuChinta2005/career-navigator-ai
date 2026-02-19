@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { SKILL_GAP_PROMPT, CAREER_COACH_PROMPT, ROADMAP_GENERATOR_PROMPT } from './prompts';
+import { SKILL_GAP_PROMPT, CAREER_COACH_PROMPT, ROADMAP_GENERATOR_PROMPT, ROADMAP_STRUCTURED_PROMPT } from './prompts';
 import type { SkillGapAnalysis, CareerAdvice } from './types';
 
 // Initialize Gemini API
@@ -56,6 +56,60 @@ const getMockCareerAdvice = (question: string): CareerAdvice => ({
         'Build and deploy one project per month',
         'Attend local developer meetups'
     ]
+});
+
+// ─── Mock Structured Roadmap (no API key fallback) ────────────────────────────
+const getMockStructuredRoadmap = (targetRole: string) => ({
+    phases: [
+        {
+            title: '30-Day Foundation',
+            color: 'cyan',
+            weeks: [
+                {
+                    title: 'Week 1: Core Fundamentals',
+                    tasks: [
+                        { title: `Research the ${targetRole} role requirements`, priority: 'high', resource: 'https://roadmap.sh' },
+                        { title: 'Identify your current skill gaps', priority: 'high', resource: '' },
+                        { title: 'Set up your learning environment', priority: 'medium', resource: '' },
+                    ],
+                },
+                {
+                    title: 'Week 2: Foundational Skills',
+                    tasks: [
+                        { title: 'Complete a beginner course on the core technology', priority: 'high', resource: 'https://freecodecamp.org' },
+                        { title: 'Complete 10 practice exercises', priority: 'medium', resource: '' },
+                    ],
+                },
+            ],
+        },
+        {
+            title: '60-Day Intermediate',
+            color: 'violet',
+            weeks: [
+                {
+                    title: 'Week 5: Intermediate Concepts',
+                    tasks: [
+                        { title: 'Build a small project using learned skills', priority: 'high', resource: '' },
+                        { title: 'Study advanced patterns and best practices', priority: 'high', resource: 'https://developer.mozilla.org' },
+                    ],
+                },
+            ],
+        },
+        {
+            title: '90-Day Advanced',
+            color: 'pink',
+            weeks: [
+                {
+                    title: 'Week 10: Interview Preparation',
+                    tasks: [
+                        { title: 'Complete a full portfolio project', priority: 'high', resource: '' },
+                        { title: 'Do 5 mock interviews', priority: 'high', resource: 'https://interviewing.io' },
+                        { title: 'Apply to target companies', priority: 'high', resource: 'https://linkedin.com' },
+                    ],
+                },
+            ],
+        },
+    ],
 });
 
 export const aiService = {
@@ -139,6 +193,40 @@ export const aiService = {
         } catch (error) {
             console.error('AI Error:', error);
             return '# Roadmap generation failed. Please try again.';
+        }
+    },
+
+    /**
+     * Generate a structured JSON roadmap for the roadmap store
+     */
+    generateRoadmapStructured: async (
+        targetRole: string,
+        currentSkills: string,
+        timeline: number,
+        focusAreas: string
+    ) => {
+        if (!genAI) {
+            // Simulate delay for better UX
+            await new Promise((r) => setTimeout(r, 1500));
+            return getMockStructuredRoadmap(targetRole);
+        }
+
+        try {
+            const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+            const prompt = ROADMAP_STRUCTURED_PROMPT(targetRole, currentSkills, timeline, focusAreas);
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const text = response.text();
+
+            // Extract JSON — Gemini sometimes wraps in ```json ... ```
+            const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) throw new Error('No JSON found in AI response');
+
+            return JSON.parse(jsonMatch[0]);
+        } catch (error) {
+            console.error('AI Roadmap generation error:', error);
+            return getMockStructuredRoadmap(targetRole);
         }
     },
 

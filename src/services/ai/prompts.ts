@@ -40,6 +40,53 @@ Provide week-by-week breakdown with:
 Format as markdown.
 `;
 
+export const ROADMAP_STRUCTURED_PROMPT = (
+    targetRole: string,
+    currentSkills: string,
+    timeline: number,
+    focusAreas: string
+) => `
+You are an expert career learning path designer. Create a detailed, realistic ${timeline}-day learning roadmap for someone aiming to become a ${targetRole}.
+
+CURRENT SKILLS: ${currentSkills || 'Not specified'}
+FOCUS AREAS: ${focusAreas || 'General preparation'}
+
+Design the roadmap as ${Math.ceil(timeline / 30)} phases of roughly 30 days each.
+
+Return ONLY valid JSON in this EXACT format (no markdown, no extra text):
+{
+  "phases": [
+    {
+      "title": "30-Day Foundation",
+      "color": "cyan",
+      "weeks": [
+        {
+          "title": "Week 1: Topic Name",
+          "tasks": [
+            {
+              "title": "Specific task to complete",
+              "priority": "high",
+              "resource": "https://real-url.com or descriptive note"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+RULES:
+- Use exactly ${Math.ceil(timeline / 30)} phase(s)
+- Phase titles must follow pattern: "30-Day X", "60-Day X", "90-Day X", etc.
+- Colors must rotate through: "cyan", "violet", "pink", "emerald", "orange"
+- Each phase must have 2-4 weeks
+- Each week must have 2-5 specific, actionable tasks
+- Priority must be one of: "high", "medium", "low"
+- resources should be real URLs when possible (official docs, free courses like FreeCodeCamp, MDN, etc.)
+- Tasks should be concrete and achievable within the week
+- Focus on skills most relevant to ${targetRole}
+`;
+
 export const INTERVIEW_PREP_PROMPT = (role: string, skillLevel: string) => `
 Generate 5 interview questions for a ${role} position.
 Candidate skill level: ${skillLevel}

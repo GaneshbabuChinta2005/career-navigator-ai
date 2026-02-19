@@ -1,12 +1,10 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { Target, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Form,
   FormField,
@@ -23,10 +21,8 @@ import { toast } from 'sonner';
 
 export const SignupForm = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { login } = useAuthStore();
 
-  // Use demo auth service if demo mode is enabled
   const authSvc = isDemoMode() ? demoAuthService : authService;
 
   const form = useForm<SignupFormData>({
@@ -51,13 +47,9 @@ export const SignupForm = () => {
     },
   });
 
-  const onSubmit = async (values: SignupFormData) => {
-    mutation.mutate(values);
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-4">
         {mutation.error && (
           <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
             {mutation.error.message}
@@ -71,12 +63,7 @@ export const SignupForm = () => {
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input
-                  type="text"
-                  placeholder="John Doe"
-                  disabled={mutation.isPending}
-                  {...field}
-                />
+                <Input type="text" placeholder="John Doe" disabled={mutation.isPending} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -90,12 +77,7 @@ export const SignupForm = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  disabled={isLoading}
-                  {...field}
-                />
+                <Input type="email" placeholder="you@example.com" disabled={mutation.isPending} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,12 +91,7 @@ export const SignupForm = () => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                  {...field}
-                />
+                <Input type="password" placeholder="••••••••" disabled={mutation.isPending} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -128,33 +105,30 @@ export const SignupForm = () => {
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                  {...field}
-                />
+                <Input type="password" placeholder="••••••••" disabled={mutation.isPending} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={isLoading}
-          size="lg"
-        >
-          {isLoading ? (
+        <Button type="submit" className="w-full" disabled={mutation.isPending} size="lg">
+          {mutation.isPending ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating account...
             </>
           ) : (
             'Create Account'
           )}
         </Button>
+
+        <p className="text-center text-sm">
+          Already have an account?{' '}
+          <Link to="/login" className="text-primary hover:underline font-medium">
+            Sign in
+          </Link>
+        </p>
       </form>
     </Form>
   );

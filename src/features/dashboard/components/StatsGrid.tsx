@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Target, CheckCircle2, Clock, AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
+import { Card, CardContent } from '@/components/ui/card';
+import { Target, CheckCircle2, Clock, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface StatProps {
     label: string;
@@ -8,18 +8,17 @@ interface StatProps {
     suffix?: string;
     change: number;
     icon: React.ElementType;
-    colorClass: string;
+    gradient: string;
+    glow: string;
 }
 
 const AnimatedCounter = ({ target, suffix = '' }: { target: number; suffix?: string }) => {
     const [count, setCount] = useState(0);
 
     useEffect(() => {
-        const duration = 1000;
         const steps = 60;
         const increment = target / steps;
         let current = 0;
-
         const timer = setInterval(() => {
             current += increment;
             if (current >= target) {
@@ -28,19 +27,25 @@ const AnimatedCounter = ({ target, suffix = '' }: { target: number; suffix?: str
             } else {
                 setCount(Math.floor(current));
             }
-        }, duration / steps);
-
+        }, 1000 / steps);
         return () => clearInterval(timer);
     }, [target]);
 
-    return <span>{count}{suffix}</span>;
+    return (
+        <span>
+            {count}
+            {suffix}
+        </span>
+    );
 };
 
-const StatCard = ({ label, value, suffix, change, icon: Icon, colorClass }: StatProps) => {
+const StatCard = ({ label, value, suffix, change, icon: Icon, gradient, glow }: StatProps) => {
     const isPositive = change >= 0;
 
     return (
-        <Card className="hover:shadow-lg transition-shadow duration-300 cursor-pointer group">
+        <Card className="relative overflow-hidden hover:scale-[1.02] transition-transform duration-300 cursor-pointer group shadow-card">
+            {/* Gradient top border */}
+            <div className={`absolute top-0 left-0 right-0 h-0.5 ${gradient}`} />
             <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -48,20 +53,25 @@ const StatCard = ({ label, value, suffix, change, icon: Icon, colorClass }: Stat
                         <h3 className="text-3xl font-bold tracking-tight mb-2">
                             <AnimatedCounter target={value} suffix={suffix} />
                         </h3>
-                        <div className="flex items-center gap-1 text-sm">
+                        <div className="flex items-center gap-1 text-xs">
                             {isPositive ? (
-                                <TrendingUp className="w-4 h-4 text-green-600" />
+                                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
                             ) : (
-                                <TrendingDown className="w-4 h-4 text-red-600" />
+                                <TrendingDown className="w-3.5 h-3.5 text-red-400" />
                             )}
-                            <span className={isPositive ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
-                                {isPositive ? '+' : ''}{change}%
+                            <span className={isPositive ? 'text-emerald-400 font-semibold' : 'text-red-400 font-semibold'}>
+                                {isPositive ? '+' : ''}
+                                {change}%
                             </span>
-                            <span className="text-muted-foreground">vs last week</span>
+                            <span className="text-muted-foreground ml-0.5">vs last week</span>
                         </div>
                     </div>
-                    <div className={`p-3 rounded-xl bg-opacity-10 group-hover:scale-110 transition-transform duration-300 ${colorClass}`}>
-                        <Icon className="w-6 h-6" />
+                    {/* Icon circle with gradient */}
+                    <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 ${gradient}`}
+                        style={{ boxShadow: glow }}
+                    >
+                        <Icon className="w-6 h-6 text-background" />
                     </div>
                 </div>
             </CardContent>
@@ -78,7 +88,8 @@ export const StatsGrid = () => {
                 suffix="%"
                 change={8}
                 icon={Target}
-                colorClass="text-blue-600 bg-blue-500"
+                gradient="bg-gradient-to-r from-cyan-500 to-cyan-400"
+                glow="0 0 20px rgba(0, 229, 255, 0.3)"
             />
             <StatCard
                 label="Skills Mastered"
@@ -86,7 +97,8 @@ export const StatsGrid = () => {
                 suffix="/28"
                 change={12}
                 icon={CheckCircle2}
-                colorClass="text-green-600 bg-green-500"
+                gradient="bg-gradient-to-r from-emerald-500 to-emerald-400"
+                glow="0 0 20px rgba(52, 211, 153, 0.3)"
             />
             <StatCard
                 label="Study Hours"
@@ -94,14 +106,16 @@ export const StatsGrid = () => {
                 suffix="h"
                 change={15}
                 icon={Clock}
-                colorClass="text-purple-600 bg-purple-500"
+                gradient="bg-gradient-to-r from-violet-500 to-violet-400"
+                glow="0 0 20px rgba(168, 85, 247, 0.3)"
             />
             <StatCard
                 label="Action Items"
                 value={6}
                 change={-25}
                 icon={AlertCircle}
-                colorClass="text-orange-600 bg-orange-500"
+                gradient="bg-gradient-to-r from-orange-500 to-orange-400"
+                glow="0 0 20px rgba(249, 115, 22, 0.3)"
             />
         </div>
     );
