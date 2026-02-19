@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,13 +13,25 @@ import {
   FormControl,
   FormMessage,
 } from '@/components/ui/form';
-import { Loader2 } from 'lucide-react';
-import { loginSchema, type LoginInput } from '@/lib/validation';
+import { Loader2, Target } from 'lucide-react';
+import { authService } from '@/features/auth/services/auth.service';
+import { useAuthStore } from '@/store/useAuthStore';
+import { toast } from 'sonner';
+
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type LoginInput = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuthStore();
+
+  const from = (location.state as any)?.from?.pathname || '/app/dashboard';
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -30,94 +43,104 @@ export const LoginForm = () => {
 
   const onSubmit = async (values: LoginInput) => {
     setIsLoading(true);
-    setError(null);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock validation
-      if (values.email === 'demo@example.com' && values.password === 'password123') {
-        localStorage.setItem('auth_token', 'mock_token_' + Date.now());
-        localStorage.setItem('user', JSON.stringify({ email: values.email }));
-        navigate('/dashboard');
-      } else {
-        setError('Invalid email or password. Try demo@example.com / password123');
-      }
-    } catch (err) {
-      setError('An error occurred. Please try again.');
+      const { user, token } = await authService.login({
+        email: values.email || '',
+        password: values.password || ''
+      });
+      login(user, token);
+      toast.success('Welcome back!');
+      navigate(from, { replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Login failed');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {error && (
-          <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
-            {error}
-          </div>
-        )}
-
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={isLoading}
-          size="lg"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Signing in...
-            </>
-          ) : (
-            'Sign In'
-          )}
-        </Button>
-
-        <p className="text-sm text-muted-foreground text-center">
-          Tip: Use demo@example.com / password123
+    <div className="w-full space-y-6">
+      {/* Logo & Title */}
+      <div className="flex flex-col items-center space-y-2 text-center">
+        <div className="flex items-center gap-2">
+          <Target className="h-10 w-10 text-primary" />
+          <h1 className="text-3xl font-bold">CareerNav</h1>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Sign in to your account to continue
         </p>
-      </form>
-    </Form>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading}
+            size="lg"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              'Sign In'
+            )}
+          </Button>
+
+          <div className="text-center space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Demo: Any email/password works (min 6 chars)
+            </p>
+            <p className="text-sm">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-primary hover:underline font-medium">
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 };

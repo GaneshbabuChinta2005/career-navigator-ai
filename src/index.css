@@ -51,11 +51,11 @@
     --gradient-card: linear-gradient(145deg, hsl(230 25% 9%), hsl(230 25% 6%));
     --gradient-glow: radial-gradient(ellipse at center, hsl(185 100% 50% / 0.12), transparent 70%);
     --gradient-mesh: radial-gradient(at 40% 20%, hsl(185 100% 50% / 0.08) 0px, transparent 50%),
-                     radial-gradient(at 80% 0%, hsl(270 100% 65% / 0.08) 0px, transparent 50%),
-                     radial-gradient(at 0% 50%, hsl(330 100% 60% / 0.05) 0px, transparent 50%),
-                     radial-gradient(at 80% 50%, hsl(185 100% 50% / 0.05) 0px, transparent 50%),
-                     radial-gradient(at 0% 100%, hsl(270 100% 65% / 0.06) 0px, transparent 50%);
-    
+      radial-gradient(at 80% 0%, hsl(270 100% 65% / 0.08) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsl(330 100% 60% / 0.05) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, hsl(185 100% 50% / 0.05) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(270 100% 65% / 0.06) 0px, transparent 50%);
+
     /* Premium shadows */
     --shadow-glow: 0 0 80px hsl(185 100% 50% / 0.25);
     --shadow-glow-accent: 0 0 60px hsl(270 100% 65% / 0.2);
@@ -86,8 +86,91 @@
   }
 
   .dark {
+    /* Dark mode is the default, so we keep the same values */
     --background: 230 25% 5%;
     --foreground: 0 0% 98%;
+
+    --card: 230 25% 7%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 230 25% 7%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 185 100% 50%;
+    --primary-foreground: 230 25% 5%;
+
+    --secondary: 230 20% 12%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 230 20% 10%;
+    --muted-foreground: 230 10% 50%;
+
+    --accent: 270 100% 65%;
+    --accent-foreground: 0 0% 98%;
+
+    --tertiary: 330 100% 60%;
+    --tertiary-foreground: 0 0% 98%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 230 20% 15%;
+    --input: 230 20% 12%;
+    --ring: 185 100% 50%;
+
+    --sidebar-background: 230 25% 5%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 185 100% 50%;
+    --sidebar-primary-foreground: 230 25% 5%;
+    --sidebar-accent: 230 20% 12%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 230 20% 15%;
+    --sidebar-ring: 185 100% 50%;
+  }
+
+  .light {
+    /* Light mode - Clean and professional */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 270 80% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    --tertiary: 330 80% 55%;
+    --tertiary-foreground: 210 40% 98%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 221 83% 53%;
   }
 }
 
@@ -105,11 +188,17 @@
     font-family: 'Inter', system-ui, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
-  code, pre {
+  code,
+  pre {
     font-family: 'JetBrains Mono', monospace;
   }
 }
@@ -199,7 +288,7 @@
 
   /* Grid pattern */
   .bg-grid-pattern {
-    background-image: 
+    background-image:
       linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
       linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px);
     background-size: 60px 60px;
@@ -234,15 +323,15 @@
   .bg-skill-beginner {
     background-color: hsl(var(--skill-beginner));
   }
-  
+
   .bg-skill-intermediate {
     background-color: hsl(var(--skill-intermediate));
   }
-  
+
   .bg-skill-advanced {
     background-color: hsl(var(--skill-advanced));
   }
-  
+
   .bg-skill-expert {
     background-color: hsl(var(--skill-expert));
   }
@@ -251,11 +340,11 @@
   .bg-status-success {
     background-color: hsl(var(--status-success));
   }
-  
+
   .bg-status-warning {
     background-color: hsl(var(--status-warning));
   }
-  
+
   .bg-status-danger {
     background-color: hsl(var(--status-danger));
   }

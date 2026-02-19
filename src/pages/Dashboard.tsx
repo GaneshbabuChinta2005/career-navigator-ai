@@ -1,161 +1,216 @@
-import { PageHeader, StatCard, ProgressRing, SkillBar } from "@/components/common";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Target, TrendingUp, BookOpen, User, LogOut, ArrowRight } from "lucide-react";
-import { useSimulation } from "@/hooks/useSimulation";
-import { analyzeSkillGaps } from "@/services/skillgap";
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { DEFAULT_SKILLS } from "@/lib/constants";
-import type { SkillLevel } from "@/types/skill";
+import { useState } from 'react';
+import { StatsGrid } from '@/features/dashboard/components/StatsGrid';
+import { LearningActivityChart, SkillsChart } from '@/features/dashboard/components/Charts';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Target,
+  TrendingUp,
+  BookOpen,
+  Award,
+  Calendar,
+  ArrowRight,
+  CheckCircle,
+  Clock
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+interface Activity {
+  id: string;
+  type: 'completed' | 'started' | 'milestone';
+  title: string;
+  time: string;
+  description: string;
+}
+
+const recentActivities: Activity[] = [
+  {
+    id: '1',
+    type: 'completed',
+    title: 'Completed React Hooks Module',
+    time: '2 hours ago',
+    description: 'useState, useEffect, and custom hooks'
+  },
+  {
+    id: '2',
+    type: 'milestone',
+    title: 'Reached 70% Role Readiness',
+    time: '5 hours ago',
+    description: 'Frontend Developer track'
+  },
+  {
+    id: '3',
+    type: 'started',
+    title: 'Started System Design Course',
+    time: 'Yesterday',
+    description: 'Scalability and Architecture Patterns'
+  },
+  {
+    id: '4',
+    type: 'completed',
+    title: 'Finished TypeScript Generics',
+    time: '2 days ago',
+    description: 'Advanced type manipulation'
+  }
+];
+
+const quickActions = [
+  {
+    icon: Target,
+    label: 'Run Simulation',
+    description: 'Check role readiness',
+    link: '/app/simulation',
+    color: 'text-blue-600 bg-blue-50 hover:bg-blue-100'
+  },
+  {
+    icon: TrendingUp,
+    label: 'Skill Gap Analysis',
+    description: 'Find what to learn',
+    link: '/app/skill-gap',
+    color: 'text-green-600 bg-green-50 hover:bg-green-100'
+  },
+  {
+    icon: Calendar,
+    label: 'View Roadmap',
+    description: '30/60/90 day plan',
+    link: '/app/roadmap',
+    color: 'text-purple-600 bg-purple-50 hover:bg-purple-100'
+  },
+  {
+    icon: Award,
+    label: 'Track Progress',
+    description: 'See achievements',
+    link: '/app/profile',
+    color: 'text-orange-600 bg-orange-50 hover:bg-orange-100'
+  }
+];
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const { result, userData } = useSimulation();
+  const [greeting] = useState(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  });
 
-  const gaps = useMemo(
-    () => analyzeSkillGaps(userData.skills),
-    [userData.skills]
-  );
+  const getActivityIcon = (type: Activity['type']) => {
+    switch (type) {
+      case 'completed':
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'milestone':
+        return <Award className="w-4 h-4 text-purple-600" />;
+      case 'started':
+        return <BookOpen className="w-4 h-4 text-blue-600" />;
+    }
+  };
 
-  const criticalGaps = gaps.filter(g => g.priority === 'critical');
-  const importantGaps = gaps.filter(g => g.priority === 'important');
-
-  const handleLogout = () => {
-    localStorage.removeItem('auth_token');
-    navigate('/login');
+  const getActivityColor = (type: Activity['type']) => {
+    switch (type) {
+      case 'completed':
+        return 'bg-green-50 border-green-200';
+      case 'milestone':
+        return 'bg-purple-50 border-purple-200';
+      case 'started':
+        return 'bg-blue-50 border-blue-200';
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="font-display font-bold text-xl">CareerSim</Link>
-          <nav className="flex items-center gap-4">
-            <Link to="/simulation" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Simulation</Link>
-            <Link to="/skill-gap" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Skill Gap</Link>
-            <Link to="/roadmap" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Roadmap</Link>
-            <Link to="/profile">
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
-              <LogOut className="h-4 w-4" />
+    <div className="space-y-6">
+      {/* Enhanced Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            {greeting}! 👋
+          </h1>
+          <p className="text-muted-foreground">
+            Here's your learning progress and recommendations
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Link to="/app/roadmap">
+            <Button variant="outline" size="sm">
+              <Calendar className="w-4 h-4 mr-2" />
+              View Plan
             </Button>
-          </nav>
+          </Link>
+          <Link to="/app/simulation">
+            <Button size="sm">
+              <Target className="w-4 h-4 mr-2" />
+              Run Simulation
+            </Button>
+          </Link>
         </div>
-      </header>
+      </div>
 
-      <main className="container py-8">
-        <PageHeader
-          title="Dashboard"
-          description="Your career simulation overview"
-        />
+      {/* Stats Grid */}
+      <StatsGrid />
 
-        <div className="grid gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3">
-          {/* Readiness Score Card */}
-          <div className="md:col-span-2 lg:col-span-1 rounded-xl border border-border bg-card p-6">
-            <h2 className="font-semibold mb-4">Role Readiness</h2>
-            <div className="flex items-center gap-6">
-              <ProgressRing value={result.readinessScore} size="lg" label="Ready" />
-              <div>
-                <p className="font-display font-bold text-lg">{result.roleName}</p>
-                <p className="text-sm text-muted-foreground mt-1">{result.recommendation}</p>
-                <Link to="/simulation">
-                  <Button variant="outline" size="sm" className="mt-4">
-                    Run New Simulation
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <StatCard
-            label="Skills Tracked"
-            value={Object.keys(userData.skills).length}
-            icon={Target}
-          />
-          <StatCard
-            label="Skill Gaps Found"
-            value={gaps.length}
-            icon={BookOpen}
-            trend={criticalGaps.length > 0 ? { value: criticalGaps.length, isPositive: false } : undefined}
-          />
-        </div>
-
-        {/* Strengths & Weaknesses */}
-        <div className="grid gap-6 mt-8 md:grid-cols-2">
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Your Strengths</h3>
-              <TrendingUp className="h-4 w-4 text-primary" />
-            </div>
-            {result.strengths.length > 0 ? (
-              <ul className="space-y-3">
-                {result.strengths.map(s => (
-                  <li key={s} className="flex items-center gap-2 text-sm">
-                    <span className="w-2 h-2 rounded-full bg-primary" />
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-muted-foreground">Complete onboarding to see strengths</p>
-            )}
-            <Link to="/simulation" className="inline-flex items-center gap-1 text-sm text-primary mt-4 hover:underline">
-              View All Skills <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Focus Areas</h3>
-              <Target className="h-4 w-4 text-destructive" />
-            </div>
-            {(criticalGaps.length > 0 || importantGaps.length > 0) ? (
-              <ul className="space-y-3">
-                {[...criticalGaps, ...importantGaps].slice(0, 4).map(g => (
-                  <li key={g.id} className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${g.priority === 'critical' ? 'bg-destructive' : 'bg-yellow-500'}`} />
-                      {g.skill}
-                    </span>
-                    <span className="text-xs text-muted-foreground">{g.priority}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-muted-foreground">No critical gaps found!</p>
-            )}
-            <Link to="/skill-gap" className="inline-flex items-center gap-1 text-sm text-primary mt-4 hover:underline">
-              Start Improving <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Quick Skills Overview */}
-        <div className="rounded-xl border border-border bg-card p-6 mt-8">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold">Skills Overview</h3>
-            <Link to="/profile">
-              <Button variant="outline" size="sm">Edit Skills</Button>
-            </Link>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            {DEFAULT_SKILLS.map(skill => (
-              <SkillBar
-                key={skill.id}
-                name={skill.name}
-                level={(userData.skills[skill.id] || 0) as SkillLevel}
-                showLabel={false}
-                size="sm"
-              />
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {quickActions.map((action) => (
+              <Link key={action.label} to={action.link}>
+                <div className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md ${action.color}`}>
+                  <action.icon className="w-8 h-8 mb-3" />
+                  <h3 className="font-semibold mb-1">{action.label}</h3>
+                  <p className="text-xs text-muted-foreground">{action.description}</p>
+                </div>
+              </Link>
             ))}
           </div>
-        </div>
-      </main>
+        </CardContent>
+      </Card>
+
+      {/* Charts */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <LearningActivityChart />
+        <SkillsChart />
+      </div>
+
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Recent Activity</CardTitle>
+          <Button variant="ghost" size="sm">
+            View All
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {recentActivities.map((activity) => (
+              <div
+                key={activity.id}
+                className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-sm ${getActivityColor(activity.type)}`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    {getActivityIcon(activity.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="font-semibold text-sm">{activity.title}</h4>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {activity.time}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {activity.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

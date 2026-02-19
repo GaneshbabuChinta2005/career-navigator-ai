@@ -27,7 +27,7 @@ const Onboarding = () => {
 
   const handleComplete = () => {
     complete();
-    navigate('/dashboard');
+    navigate('/app/dashboard');
   };
 
   return (

@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { Target, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Form,
   FormField,
@@ -12,15 +15,21 @@ import {
   FormControl,
   FormMessage,
 } from '@/components/ui/form';
-import { Loader2 } from 'lucide-react';
-import { signupSchema, type SignupInput } from '@/lib/validation';
+import { authService } from '@/features/auth/services/auth.service';
+import { demoAuthService, isDemoMode } from '@/features/auth/services/demo-auth.service';
+import { useAuthStore } from '@/store/useAuthStore';
+import { signupSchema, type SignupFormData } from '@/features/auth/types';
+import { toast } from 'sonner';
 
 export const SignupForm = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuthStore();
 
-  const form = useForm<SignupInput>({
+  // Use demo auth service if demo mode is enabled
+  const authSvc = isDemoMode() ? demoAuthService : authService;
+
+  const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       name: '',
@@ -30,48 +39,28 @@ export const SignupForm = () => {
     },
   });
 
-  const onSubmit = async (values: SignupInput) => {
-    setIsLoading(true);
-    setError(null);
+  const mutation = useMutation({
+    mutationFn: authSvc.signup,
+    onSuccess: (data) => {
+      login(data.user, data.token);
+      toast.success(isDemoMode() ? '🎭 Demo mode - Account created!' : 'Account created successfully');
+      navigate('/app/dashboard');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Signup failed');
+    },
+  });
 
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Check if user already exists (mock)
-      const existingUsers = JSON.parse(
-        localStorage.getItem('mock_users') || '[]'
-      );
-      if (existingUsers.some((u: any) => u.email === values.email)) {
-        setError('An account with this email already exists');
-        setIsLoading(false);
-        return;
-      }
-
-      // Create user (mock)
-      existingUsers.push({
-        name: values.name,
-        email: values.email,
-        password: values.password,
-      });
-      localStorage.setItem('mock_users', JSON.stringify(existingUsers));
-      localStorage.setItem('auth_token', 'mock_token_' + Date.now());
-      localStorage.setItem('user', JSON.stringify({ name: values.name, email: values.email }));
-
-      navigate('/onboarding');
-    } catch (err) {
-      setError('An error occurred. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+  const onSubmit = async (values: SignupFormData) => {
+    mutation.mutate(values);
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {error && (
+        {mutation.error && (
           <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
-            {error}
+            {mutation.error.message}
           </div>
         )}
 
@@ -85,7 +74,7 @@ export const SignupForm = () => {
                 <Input
                   type="text"
                   placeholder="John Doe"
-                  disabled={isLoading}
+                  disabled={mutation.isPending}
                   {...field}
                 />
               </FormControl>

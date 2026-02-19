@@ -1,5 +1,5 @@
-import { AuthLayout } from "@/components/auth";
-import { SignupForm } from "@/components/auth";
+import AuthLayout from "@/layouts/AuthLayout";
+import { SignupForm } from "@/features/auth/components/SignupForm";
 import { Link } from "react-router-dom";
 
 const Signup = () => {
