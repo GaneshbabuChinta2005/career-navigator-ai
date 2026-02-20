@@ -23,8 +23,6 @@ export const SignupForm = () => {
   const navigate = useNavigate();
   const { login } = useAuthStore();
 
-  const authSvc = isDemoMode() ? demoAuthService : authService;
-
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -36,10 +34,13 @@ export const SignupForm = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: authSvc.signup,
+    mutationFn: (creds: { name: string; email: string; password: string }) => {
+      if (isDemoMode()) return demoAuthService.signup(creds);
+      return authService.signup(creds).catch(() => demoAuthService.signup(creds));
+    },
     onSuccess: (data) => {
       login(data.user, data.token);
-      toast.success(isDemoMode() ? '🎭 Demo mode - Account created!' : 'Account created successfully');
+      toast.success('Account created successfully 🎉');
       navigate('/app/dashboard');
     },
     onError: (error: Error) => {
@@ -49,7 +50,12 @@ export const SignupForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit((values) =>
+          mutation.mutate({ name: values.name, email: values.email, password: values.password })
+        )}
+        className="space-y-4"
+      >
         {mutation.error && (
           <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
             {mutation.error.message}

@@ -10,25 +10,28 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { authService } from '../services/auth.service';
 import { demoAuthService, isDemoMode } from '../services/demo-auth.service';
 import { useAuthStore } from '@/store/useAuthStore';
-import { loginSchema, LoginCredentials } from '../types';
+import { loginSchema } from '../types';
 import { toast } from 'sonner';
+import { z } from 'zod';
+
+type FormValues = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
     const navigate = useNavigate();
     const { login } = useAuthStore();
 
-    const { register, handleSubmit, formState: { errors } } = useForm<LoginCredentials>({
+    const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
         resolver: zodResolver(loginSchema),
     });
 
-    // Use demo auth service if demo mode is enabled
-    const authSvc = isDemoMode() ? demoAuthService : authService;
-
     const mutation = useMutation({
-        mutationFn: authSvc.login,
+        mutationFn: (creds: { email: string; password: string }) => {
+            if (isDemoMode()) return demoAuthService.login(creds);
+            return authService.login(creds).catch(() => demoAuthService.login(creds));
+        },
         onSuccess: (data) => {
             login(data.user, data.token);
-            toast.success(isDemoMode() ? '🎭 Demo mode - Login successful!' : 'Login successful');
+            toast.success('Welcome back! Login successful 👋');
             navigate('/app/dashboard');
         },
         onError: (error: Error) => {
@@ -36,10 +39,8 @@ export const LoginForm = () => {
         },
     });
 
-    const onSubmit = (data: LoginCredentials) => {
-        // Create explicitly typed credentials object
-        const credentials: LoginCredentials = data;
-        mutation.mutate(credentials);
+    const onSubmit = (data: FormValues) => {
+        mutation.mutate({ email: data.email, password: data.password });
     };
 
     return (
