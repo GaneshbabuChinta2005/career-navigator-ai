@@ -7,12 +7,9 @@ import { useAuthStore } from "@/store/useAuthStore";
 
 // Layouts
 import MainLayout from "@/layouts/MainLayout";
-import AuthLayout from "@/layouts/AuthLayout";
 
 // Pages
 import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Simulation from "./pages/Simulation";
@@ -20,6 +17,10 @@ import SkillGap from "./pages/SkillGap";
 import Roadmap from "./pages/Roadmap";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import AITools from "./pages/AITools";
+import AICoverLetter from "./pages/AICoverLetter";
+import AILinkedin from "./pages/AILinkedin";
+import AISalary from "./pages/AISalary";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,8 +33,15 @@ const queryClient = new QueryClient({
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const { isAuthenticated } = useAuthStore();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  const { isAuthenticated, login } = useAuthStore();
+  if (!isAuthenticated) {
+    login({
+      id: 'demo-user-123',
+      name: 'Demo User',
+      email: 'demo@career.ai',
+      role: 'user',
+    }, 'demo-jwt-token-auto');
+  }
   return children;
 };
 
@@ -46,10 +54,7 @@ const App = () => (
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Index />} />
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-          </Route>
+
 
           {/* Protected routes with MainLayout - all under /app prefix */}
           <Route
@@ -66,6 +71,10 @@ const App = () => (
             <Route path="skill-gap" element={<SkillGap />} />
             <Route path="roadmap" element={<Roadmap />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="ai-tools" element={<AITools />} />
+            <Route path="ai-tools/cover-letter" element={<AICoverLetter />} />
+            <Route path="ai-tools/linkedin" element={<AILinkedin />} />
+            <Route path="ai-tools/salary" element={<AISalary />} />
           </Route>
 
           {/* Catch-all */}

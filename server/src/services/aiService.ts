@@ -277,3 +277,160 @@ Provide helpful, personalized career advice. Be encouraging but realistic. Keep 
     const result = await model.generateContent(prompt);
     return result.response.text();
 };
+
+/**
+ * Generate a personalized cover letter matching candidate details with a job description.
+ */
+export const generateCoverLetter = async (input: {
+    userInfo: {
+        name: string;
+        email: string;
+        phone?: string;
+        currentTitle: string;
+        experience: string;
+        skills: string;
+        achievements?: string;
+    };
+    jobInfo: {
+        title: string;
+        company: string;
+        description: string;
+        hiringManager?: string;
+    };
+    tone: string;
+    length: string;
+}): Promise<any> => {
+    const prompt = `
+You are an expert career coach. Generate a personalized cover letter matching candidate details with a job description.
+
+CANDIDATE INFORMATION:
+Name: ${input.userInfo.name}
+Email: ${input.userInfo.email}
+Phone: ${input.userInfo.phone || ''}
+Current Title: ${input.userInfo.currentTitle}
+Experience: ${input.userInfo.experience}
+Skills: ${input.userInfo.skills}
+Achievements: ${input.userInfo.achievements || ''}
+
+JOB DETAILS:
+Position: ${input.jobInfo.title}
+Company: ${input.jobInfo.company}
+Hiring Manager: ${input.jobInfo.hiringManager || ''}
+Job Description: ${input.jobInfo.description}
+
+Generate a ${input.length} cover letter with a ${input.tone} tone.
+
+Return ONLY valid JSON in this exact format:
+{
+  "coverLetter": "The complete text of the cover letter. Use single newlines for spacing. Do not include address blocks or placeholders like [Your Name]. Use the details provided directly.",
+  "keyPoints": ["Highlighted point 1", "Highlighted point 2"],
+  "matchedSkills": ["Skill 1", "Skill 2"],
+  "suggestions": ["Tip for personalization 1", "Tip for personalization 2"]
+}
+`;
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+        throw new Error('Failed to parse AI response');
+    }
+    return JSON.parse(jsonMatch[0]);
+};
+
+/**
+ * Evaluate user skills/experience and suggest LinkedIn profile enhancements.
+ */
+export const optimizeLinkedInProfile = async (input: {
+    name: string;
+    currentTitle: string;
+    experience: string;
+    skills: string;
+    targetRole: string;
+}): Promise<any> => {
+    const prompt = `
+You are an expert LinkedIn profile optimization specialist. Analyze the user's profile and target role to provide suggestions.
+
+PROFILE DETAILS:
+Name: ${input.name}
+Current Title: ${input.currentTitle}
+Target Role: ${input.targetRole}
+Experience: ${input.experience}
+Skills: ${input.skills}
+
+Return ONLY valid JSON in this exact format:
+{
+  "optimizedHeadline": "A compelling, keyword-rich LinkedIn headline (max 220 chars)",
+  "aboutSummary": "An engaging, professional 'About' section written in first-person (3-4 paragraphs)",
+  "experienceEnhancements": [
+    {
+      "role": "Role Name",
+      "originalPoints": "Overview of original description",
+      "optimizedPoints": ["Bullet point 1 using action verbs and metrics", "Bullet point 2 using action verbs and metrics"]
+    }
+  ],
+  "keywordSuggestions": ["keyword1", "keyword2"],
+  "actionItems": ["Actionable step 1 to improve visibility", "Actionable step 2 to improve visibility"]
+}
+`;
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+        throw new Error('Failed to parse AI response');
+    }
+    return JSON.parse(jsonMatch[0]);
+};
+
+/**
+ * Analyze context to build a negotiation script and strategy.
+ */
+export const negotiateSalary = async (input: {
+    role: string;
+    experienceLevel: string;
+    location: string;
+    currentOffer?: string;
+    targetSalary?: string;
+}): Promise<any> => {
+    const prompt = `
+You are a professional salary negotiator. Build a negotiation script and strategy handbook.
+
+NEGOTIATION CONTEXT:
+Role: ${input.role}
+Experience Level: ${input.experienceLevel}
+Location: ${input.location}
+Current Offer: ${input.currentOffer || 'Not specified'}
+Target Salary: ${input.targetSalary || 'Not specified'}
+
+Return ONLY valid JSON in this exact format:
+{
+  "marketInsights": {
+    "low": number (e.g. 70000),
+    "median": number (e.g. 95000),
+    "high": number (e.g. 130000),
+    "currency": "USD",
+    "description": "Brief description of the market status for this role"
+  },
+  "scripts": {
+    "email": "An email draft asking for a salary revision professionally",
+    "verbal": "A verbal script/talking points to use during a live discussion"
+  },
+  "strategies": ["Negotiation strategy 1", "Negotiation strategy 2"],
+  "objectionHandlers": [
+    {
+      "employerObjection": "Employer's reason for not paying more (e.g. budget limits)",
+      "counterArgument": "The candidate's response scripts and counter reasoning"
+    }
+  ]
+}
+`;
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+        throw new Error('Failed to parse AI response');
+    }
+    return JSON.parse(jsonMatch[0]);
+};

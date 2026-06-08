@@ -6,12 +6,16 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isAuthenticated } = useAuthStore();
-    const location = useLocation();
+    const { isAuthenticated, login } = useAuthStore();
 
     if (!isAuthenticated) {
-        // Redirect to login page, but save the current location they were trying to go to
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        // Auto-login with default demo credentials
+        login({
+            id: 'demo-user-123',
+            name: 'Demo User',
+            email: 'demo@career.ai',
+            role: 'user',
+        }, 'demo-jwt-token-auto');
     }
 
     return children;
