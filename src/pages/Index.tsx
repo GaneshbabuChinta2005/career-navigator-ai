@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Zap, Target, Map, TrendingUp, ChevronRight } from 'lucide-react';
+import { ArrowRight, Zap, Target, Map, TrendingUp } from 'lucide-react';
 
 const features = [
   {
@@ -59,12 +59,9 @@ const Index = () => {
           <span className="text-xl font-bold font-display">CareerNav AI</span>
         </div>
         <div className="flex items-center gap-3">
-          <Link to="/login">
-            <Button variant="ghost" size="sm">Sign In</Button>
-          </Link>
-          <Link to="/signup">
+          <Link to="/app/dashboard">
             <Button size="sm" className="bg-gradient-primary text-primary-foreground hover:opacity-90">
-              Get Started <ChevronRight className="w-4 h-4 ml-1" />
+              Go to Dashboard <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           </Link>
         </div>
@@ -89,15 +86,10 @@ const Index = () => {
         </p>
 
         <div className="flex gap-4 flex-wrap justify-center mb-16">
-          <Link to="/signup">
+          <Link to="/app/dashboard">
             <Button size="lg" className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-glow px-8 h-14 text-base font-semibold">
-              Start for Free
+              Get Started
               <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
-          <Link to="/login">
-            <Button size="lg" variant="outline" className="h-14 px-8 text-base border-border/60 hover:bg-secondary">
-              Sign In
             </Button>
           </Link>
         </div>
@@ -143,9 +135,9 @@ const Index = () => {
         <div className="glass rounded-3xl p-12 border border-primary/20 shadow-glow">
           <h2 className="text-3xl font-bold font-display mb-4">Ready to accelerate your career?</h2>
           <p className="text-muted-foreground mb-8">Join thousands of professionals who already use CareerNav AI to reach their goals faster.</p>
-          <Link to="/signup">
+          <Link to="/app/dashboard">
             <Button size="lg" className="bg-gradient-primary text-primary-foreground hover:opacity-90 px-10 h-14 text-base font-semibold shadow-glow">
-              Get Started Free
+              Get Started
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </Link>

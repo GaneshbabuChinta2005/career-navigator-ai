@@ -69,7 +69,7 @@ export const LoginForm = () => {
             </CardContent>
             <CardFooter className="justify-center">
                 <p className="text-sm text-muted-foreground">
-                    Don't have an account? <Link to="/signup" className="text-primary cursor-pointer hover:underline font-medium">Sign up</Link>
+                    <Link to="/" className="text-primary cursor-pointer hover:underline font-medium">Back to Home</Link>
                 </p>
             </CardFooter>
         </Card>

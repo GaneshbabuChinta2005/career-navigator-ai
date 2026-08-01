@@ -132,12 +132,6 @@ export const LoginForm = () => {
             <p className="text-xs text-muted-foreground">
               Demo: Any email/password works (min 6 chars)
             </p>
-            <p className="text-sm">
-              Don't have an account?{' '}
-              <Link to="/signup" className="text-primary hover:underline font-medium">
-                Sign up
-              </Link>
-            </p>
           </div>
         </form>
       </Form>

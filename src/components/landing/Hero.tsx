@@ -61,15 +61,10 @@ export function Hero() {
             variants={staggerItem}
             className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
           >
-            <Link to="/signup">
+            <Link to="/app/dashboard">
               <Button variant="hero" size="xl" className="group">
                 Start Your Assessment
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="outline" size="xl">
-                Log In
               </Button>
             </Link>
           </motion.div>

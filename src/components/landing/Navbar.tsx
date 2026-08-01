@@ -51,11 +51,8 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-sm">Log In</Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="default" size="sm" className="text-sm">Get Started</Button>
+            <Link to="/app/dashboard">
+              <Button variant="default" size="sm" className="text-sm">Go to Dashboard</Button>
             </Link>
           </div>
 
@@ -93,11 +90,8 @@ export function Navbar() {
                   </motion.a>
                 ))}
                 <div className="flex gap-3 pt-4 mt-2 border-t border-border/50">
-                  <Link to="/login" className="flex-1">
-                    <Button variant="ghost" size="sm" className="w-full">Log In</Button>
-                  </Link>
-                  <Link to="/signup" className="flex-1">
-                    <Button variant="default" size="sm" className="w-full">Get Started</Button>
+                  <Link to="/app/dashboard" className="flex-1">
+                    <Button variant="default" size="sm" className="w-full">Go to Dashboard</Button>
                   </Link>
                 </div>
               </div>

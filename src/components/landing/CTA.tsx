@@ -58,9 +58,9 @@ export function CTA() {
                 variants={staggerItem}
                 className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
               >
-                <Link to="/signup">
+                <Link to="/app/dashboard">
                   <Button variant="hero" size="xl" className="group text-lg">
-                    Get Started Free
+                    Get Started
                     <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </Link>

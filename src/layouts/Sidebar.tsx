@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
     Target,
@@ -7,6 +7,9 @@ import {
     PlayCircle,
     User,
     LogOut,
+    Brain,
+    CalendarDays,
+    FileText,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button } from '@/components/ui/button';
@@ -15,14 +18,23 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navigation = [
     { name: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
+    { name: 'Resume Analyzer', href: '/app/resume', icon: FileText },
     { name: 'Skill Gap', href: '/app/skill-gap', icon: Target },
     { name: 'Roadmap', href: '/app/roadmap', icon: Map },
     { name: 'Simulation', href: '/app/simulation', icon: PlayCircle },
+    { name: 'Mock Interview', href: '/app/mock-interview', icon: Brain },
+    { name: 'Daily Schedule', href: '/app/schedule', icon: CalendarDays },
     { name: 'Profile', href: '/app/profile', icon: User },
 ];
 
 const Sidebar = () => {
     const { user, logout } = useAuthStore();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
 
     const getInitials = (name: string) => {
         return name
@@ -81,7 +93,7 @@ const Sidebar = () => {
                         <Button
                             variant="ghost"
                             className="flex-1 justify-start gap-3"
-                            onClick={logout}
+                            onClick={handleLogout}
                         >
                             <LogOut className="h-5 w-5" />
                             Logout
