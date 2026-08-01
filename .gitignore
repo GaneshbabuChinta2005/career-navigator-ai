@@ -27,3 +27,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary cloned copy of careercompass
+temp-careercompass/
+

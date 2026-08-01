@@ -6,7 +6,8 @@ import {
     BookOpen,
     User,
     LogOut,
-    TrendingUp
+    TrendingUp,
+    Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -16,6 +17,7 @@ const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/app/dashboard' },
     { icon: Map, label: 'Roadmap', path: '/app/roadmap' },
     { icon: BookOpen, label: 'Skill Gap', path: '/app/skill-gap' },
+    { icon: Sparkles, label: 'AI LaunchPad', path: '/app/ai-tools' },
     { icon: User, label: 'Profile', path: '/app/profile' },
 ];
 
